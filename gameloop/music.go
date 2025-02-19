@@ -83,7 +83,7 @@ func HitSound() {
 	newPlayer.Play()
 }
 
-func switchMusic(newState int) {
+func SwitchMusic(newState int) {
 	if newState == GameplayState && audioCurrentState != GameplayState {
 		fmt.Println("Playing gameplay music")
 		menuPlayer.Pause()

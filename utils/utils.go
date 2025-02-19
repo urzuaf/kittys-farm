@@ -19,3 +19,16 @@ func Swap[T any](slice *[]T, i, j int) {
 	}
 	*slice = aux
 }
+
+func IsStraight(x int) bool {
+	valids := []int{0, 4, 7, 8, 9}
+	//We keep everything true while testing
+	isValid := true
+	for _, v := range valids {
+		if v == x {
+			isValid = true
+		}
+	}
+	return isValid
+
+}

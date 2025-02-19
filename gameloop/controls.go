@@ -13,7 +13,7 @@ func ControlPlayerMovement(g *Game) {
 	if ebiten.IsKeyPressed(ebiten.KeyRight) && g.PlayerX < Configuration.ScreenWidth-28 {
 		g.PlayerX += Configuration.PlayerSpeed
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyUp) && g.PlayerY > 100 {
+	if ebiten.IsKeyPressed(ebiten.KeyUp) && g.PlayerY > 40 {
 		g.PlayerY -= Configuration.PlayerSpeed
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) && g.PlayerY < Configuration.ScreenHeight-34 {

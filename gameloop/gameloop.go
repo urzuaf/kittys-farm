@@ -2,7 +2,6 @@ package gameloop
 
 import (
 	"fmt"
-	"image/color"
 	_ "image/png"
 	"time"
 
@@ -17,7 +16,8 @@ type Config struct {
 	ScreenWidth       float64
 	ScreenHeight      float64
 	PlayerSpeed       float64
-	EnemieSpeed       float64
+	EnemieXSpeed      float64
+	EnemieYSpeed      float64
 	SpriteScaleFactor float64
 }
 
@@ -25,32 +25,40 @@ var Configuration Config = Config{
 	ScreenWidth:       480 * 0.9,
 	ScreenHeight:      640 * 0.9,
 	PlayerSpeed:       4,
-	EnemieSpeed:       3,
+	EnemieXSpeed:      3,
+	EnemieYSpeed:      2,
 	SpriteScaleFactor: 2.0,
 }
 
 type Game struct {
-	PlayerX    float64
-	PlayerY    float64
-	gameOver   bool
-	shootTimer int
-	shootRate  int
-	score      int
+	InitialMenu bool
+	PlayerX     float64
+	PlayerY     float64
+	gameOver    bool
+	shootTimer  int
+	shootRate   int
+	score       int
 
-	playerSpriteSheet *ebiten.Image
-	playerFrames      []*ebiten.Image
-	currentFrame      int
+	//Player sprites and animations
+
+	playerSpriteSheet  *ebiten.Image
+	playerFrames       []*ebiten.Image
+	playerLosingFrames []*ebiten.Image
+	currentFrame       int
 
 	playerTickCount int
 
-	bulletImage *ebiten.Image
-
+	//Enemies sprites and animations
 	enemiesSpriteSheet *ebiten.Image
 	enemiesFrames      []*ebiten.Image
 	enemies            []Enemie
+	enemiePattern      int
 
 	//flags
 	hitSoundPlayed bool
+
+	//bgMovement
+	BackgroundY float64
 }
 
 type Enemie struct {
@@ -61,8 +69,18 @@ type Enemie struct {
 
 func (g *Game) Update() error {
 
+	//Comprobar si el juego debe iniciar por primera vez
+	if g.InitialMenu {
+		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+			time.Sleep(100 * time.Millisecond)
+			g.Reset()
+		}
+		return nil
+	}
+
 	// Comprobar si el juego ha terminado y reiniciar
 	if g.gameOver {
+		AnimateLosingCharacter(g)
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 			time.Sleep(100 * time.Millisecond)
 			g.Reset()
@@ -72,6 +90,11 @@ func (g *Game) Update() error {
 
 	//Aumentar puntuación cada tick
 	g.score++
+	g.BackgroundY += 2
+
+	if g.BackgroundY >= Configuration.ScreenHeight {
+		g.BackgroundY = 0
+	}
 
 	//Mover al jugador
 	ControlPlayerMovement(g)
@@ -98,27 +121,57 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	//Dibujar menu
+	//Dibujar menu al iniciar el juego
+	if g.InitialMenu {
+		bg, _, err := ebitenutil.NewImageFromFile("assets/map/titlePressed.png")
+		if err != nil {
+			panic(err)
+		}
+		screen.DrawImage(bg, &ebiten.DrawImageOptions{})
+		return
+	}
+	//Dibujar menu al perder
 	if g.gameOver {
 		if !g.hitSoundPlayed {
 			HitSound()
 		}
 		g.hitSoundPlayed = true // Evita que el sonido se reproduzca varias veces
 		time.Sleep(300 * time.Millisecond)
-		switchMusic(MenuState)
-		ebitenutil.DebugPrint(screen, "GAME OVER - Press SPACE to Restart")
+		SwitchMusic(MenuState)
+
+		//Dibujos
+		drawer := &ebiten.DrawImageOptions{}
+		drawer.GeoM.Scale(10, 10)
+		drawer.GeoM.Translate(Configuration.ScreenWidth/2-64, Configuration.ScreenHeight/2-120)
+
+		bg, _, err := ebitenutil.NewImageFromFile("assets/map/tryAgainPressed.png")
+		if err != nil {
+			panic(err)
+		}
+		screen.DrawImage(bg, &ebiten.DrawImageOptions{})
+		screen.DrawImage(g.playerLosingFrames[g.currentFrame], drawer)
+
 		return
 	}
 
 	//Si llegamos aqui es porque no estamos en el menu
-	switchMusic(GameplayState)
+	SwitchMusic(GameplayState)
 
 	//dibujar fondo con color verde
-	backgroundColor := color.RGBA{192, 212, 112, 255}
-	screen.Fill(backgroundColor)
+	background, _, err := ebitenutil.NewImageFromFile("assets/map/map.png")
+	if err != nil {
+		panic(err)
+	}
+	bgdrawer := &ebiten.DrawImageOptions{}
+	bgdrawer.GeoM.Translate(0, g.BackgroundY)
+	screen.DrawImage(background, bgdrawer)
+	//segundo fondo
+	op2 := &ebiten.DrawImageOptions{}
+	op2.GeoM.Translate(0, g.BackgroundY-Configuration.ScreenHeight) // Dibuja una segunda copia arriba
+	screen.DrawImage(background, op2)
 
 	// Dibujar score
-	var str string = fmt.Sprintf("Score: %d ", g.score)
+	var str string = fmt.Sprintf("Score: %d, Pattern: %d", g.score, g.enemiePattern)
 	ebitenutil.DebugPrint(screen, str)
 
 	// Dibujar jugador
@@ -140,6 +193,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		})
 	}
 
+	//DrawHitboxes(g, screen)
+
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -149,20 +204,17 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func (g *Game) Reset() {
 
 	//Resetear parametros
-	ResetGameStruct(g)
+	ResetGame(g)
 
 	//Load main character
 	g.playerSpriteSheet = loadsprites.LoadFromImage("./assets/player/mc.png")
 	GetMcSprites(g)
 
+	//Load main character losing animation
+	GetLosingMcSprites(g)
+
 	//Load enemies
 	g.enemiesSpriteSheet = loadsprites.LoadFromImage("./assets/enemies/chickens.png")
 	GetEnemiesSprites(g)
 
-	//Pending to DELETE
-	img, _, err := ebitenutil.NewImageFromFile("./assets/bullet.png")
-	if err != nil {
-		panic(err)
-	}
-	g.bulletImage = img
 }

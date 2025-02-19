@@ -26,3 +26,24 @@ func GetMcSprites(g *Game) {
 	utils.RemoveElement(&g.playerFrames, 0)
 
 }
+
+func GetLosingMcSprites(g *Game) {
+	//Move around spritesheet
+	var frameCount int = 4
+	var spritewidth int = 14
+	var spriteheight int = 16
+	var paddingtop int = 32
+
+	for i := 0; i < frameCount; i++ {
+		x := i * spritewidth
+		frame := g.playerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
+		g.playerLosingFrames = append(g.playerLosingFrames, frame)
+	}
+	paddingtop = 48
+	for i := 0; i < frameCount; i++ {
+		x := i * spritewidth
+		frame := g.playerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
+		g.playerLosingFrames = append(g.playerLosingFrames, frame)
+	}
+
+}

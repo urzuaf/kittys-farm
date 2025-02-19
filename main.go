@@ -13,7 +13,8 @@ func main() {
 	game.Reset()
 	ebiten.SetWindowSize(int(math.Round(gameloop.Configuration.ScreenWidth*1.2)), int(math.Round(gameloop.Configuration.ScreenHeight*1.2)))
 	ebiten.SetVsyncEnabled(true)
-
+	game.InitialMenu = true
+	ebiten.SetWindowTitle("Kitty's Farm")
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}
