@@ -71,7 +71,7 @@ func (g *Game) Update() error {
 
 	//Comprobar si el juego debe iniciar por primera vez
 	if g.InitialMenu {
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		if inpututil.IsKeyJustPressed(ebiten.KeySpace) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 			time.Sleep(100 * time.Millisecond)
 			g.Reset()
 		}
@@ -81,7 +81,7 @@ func (g *Game) Update() error {
 	// Comprobar si el juego ha terminado y reiniciar
 	if g.gameOver {
 		AnimateLosingCharacter(g)
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		if inpututil.IsKeyJustPressed(ebiten.KeySpace) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 			time.Sleep(100 * time.Millisecond)
 			g.Reset()
 		}
