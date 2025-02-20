@@ -5,12 +5,12 @@
         margin: 0 auto;
         padding: 20px;
         display: flex;
-        align-items: center;
-        height: 100vh;
+        flex-direction: column-reverse;
       }
       /* Contenedor de controles */
       #controls {
-        position: absolute;
+        flex: 0;
+        width: fit-content;
         color: #eee;
         top: 0;
         display: flex;
