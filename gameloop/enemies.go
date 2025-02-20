@@ -61,7 +61,7 @@ func GetEnemiesSprites(g *Game) {
 
 	for i := 0; i < frameCount; i++ {
 		x := i * spritewidth
-		frame := g.enemiesSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
+		frame := g.EnemiesSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
 		g.enemiesFrames = append(g.enemiesFrames, frame)
 	}
 	utils.RemoveElement(&g.enemiesFrames, 0)

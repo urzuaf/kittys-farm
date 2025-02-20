@@ -17,7 +17,7 @@ func GetMcSprites(g *Game) {
 
 	for i := 0; i < frameCount; i++ {
 		x := i * spritewidth
-		frame := g.playerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
+		frame := g.PlayerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
 		g.playerFrames = append(g.playerFrames, frame)
 	}
 
@@ -36,13 +36,13 @@ func GetLosingMcSprites(g *Game) {
 
 	for i := 0; i < frameCount; i++ {
 		x := i * spritewidth
-		frame := g.playerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
+		frame := g.PlayerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
 		g.playerLosingFrames = append(g.playerLosingFrames, frame)
 	}
 	paddingtop = 48
 	for i := 0; i < frameCount; i++ {
 		x := i * spritewidth
-		frame := g.playerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
+		frame := g.PlayerSpriteSheet.SubImage(image.Rect(x, paddingtop, x+spritewidth, paddingtop+spriteheight)).(*ebiten.Image)
 		g.playerLosingFrames = append(g.playerLosingFrames, frame)
 	}
 
