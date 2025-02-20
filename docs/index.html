@@ -4,26 +4,39 @@
     <meta charset="UTF-8" />
     <title>Kitty's Farm</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <link rel="stylesheet" href="styles.css" >
   </head>
   <body>
+    <div>
+      <div id="controls">
+        <h2>Controls</h2>
+        <div class="keys">
+          <div class="key">W</div>
+          <div class="keygroup">
+            <div class="key">A</div>
+            <div class="key">S</div>
+            <div class="key">D</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+      <section id="load">LOADING GAME...</section>
+
     <script src="wasm_exec.js"></script>
     <script>
+      document.getElementById("load").style.display = "block";
+      document.getElementById("controls").style.display = "none";
+
       const go = new Go();
       WebAssembly.instantiateStreaming(
         fetch("game.wasm"),
         go.importObject
       ).then((result) => {
         go.run(result.instance);
+        document.getElementById("load").style.display = "none";
+      document.getElementById("controls").style.display = "flex";
       });
     </script>
   </body>
 </html>
-
-<style>
-  body {
-    text-align: center;
-    color: white;
-    background-color: #242424;
-  }
-</style>
