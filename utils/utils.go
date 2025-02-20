@@ -32,3 +32,10 @@ func IsStraight(x int) bool {
 	return isValid
 
 }
+
+func AbsValue(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}

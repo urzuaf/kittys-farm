@@ -3,6 +3,7 @@ package gameloop
 import (
 	"embed"
 	"fmt"
+	"image/color"
 	_ "image/png"
 	"time"
 
@@ -10,6 +11,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text"
+	_ "github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/image/font"
+	_ "golang.org/x/image/font/opentype"
 )
 
 type Config struct {
@@ -69,6 +74,9 @@ type Game struct {
 	MenuPlayer *audio.Player
 	GamePlayer *audio.Player
 	HitPlayer  *audio.Player
+
+	//Fonts
+	Font font.Face
 
 	//FS
 	FileSystem *embed.FS
@@ -217,6 +225,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		drawer.GeoM.Translate(Configuration.ScreenWidth/2-64, Configuration.ScreenHeight/2-120)
 
 		screen.DrawImage(g.TryAgainImage, &ebiten.DrawImageOptions{})
+		points := fmt.Sprintf("Score: %d", g.score)
+		text.Draw(screen, points, g.Font, 80, 130, color.White)
 		screen.DrawImage(g.playerLosingFrames[g.currentFrame], drawer)
 
 		return
