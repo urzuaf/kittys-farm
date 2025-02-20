@@ -204,7 +204,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.gameOver {
 		if !g.hitSoundPlayed {
 			g.HitPlayer.Play()
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 			g.HitPlayer.Pause()
 		}
 		g.hitSoundPlayed = true // Evita que el sonido se reproduzca varias veces

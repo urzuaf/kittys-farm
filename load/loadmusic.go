@@ -5,7 +5,7 @@ import (
 	"embed"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/audio/wav"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 )
 
 func LoadMusic(ctx *audio.Context, fs embed.FS, path string) *audio.Player {
@@ -13,7 +13,7 @@ func LoadMusic(ctx *audio.Context, fs embed.FS, path string) *audio.Player {
 	if err != nil {
 		panic(err)
 	}
-	musicStream, err := wav.DecodeWithSampleRate(44100, bytes.NewReader(musicFile))
+	musicStream, err := vorbis.DecodeWithSampleRate(44100, bytes.NewReader(musicFile))
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +34,7 @@ func LoadHitSound(ctx *audio.Context, fs embed.FS, path string) *audio.Player {
 	if err != nil {
 		panic(err)
 	}
-	soundStream, err := wav.DecodeWithSampleRate(44100, bytes.NewReader(soundFile))
+	soundStream, err := vorbis.DecodeWithSampleRate(44100, bytes.NewReader(soundFile))
 	if err != nil {
 		panic(err)
 	}

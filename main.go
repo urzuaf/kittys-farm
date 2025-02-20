@@ -27,9 +27,9 @@ func main() {
 	// ⚡ Usamos el contexto de Ebiten
 	audioContext := audio.CurrentContext()
 
-	game.MenuPlayer = load.LoadMusic(audioContext, assets, "assets/music/Menu.wav")
-	game.GamePlayer = load.LoadMusic(audioContext, assets, "assets/music/Game.wav")
-	game.HitPlayer = load.LoadMusic(audioContext, assets, "assets/music/sfx/Hit.wav")
+	game.MenuPlayer = load.LoadMusic(audioContext, assets, "assets/music/Menu.ogg")
+	game.GamePlayer = load.LoadMusic(audioContext, assets, "assets/music/Game.ogg")
+	game.HitPlayer = load.LoadMusic(audioContext, assets, "assets/music/sfx/Hit.ogg")
 
 	game.Reset()
 	ebiten.SetWindowSize(int(math.Round(gameloop.Configuration.ScreenWidth*1.2)), int(math.Round(gameloop.Configuration.ScreenHeight*1.2)))
