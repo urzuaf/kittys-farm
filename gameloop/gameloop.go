@@ -1,13 +1,13 @@
 package gameloop
 
 import (
+	"embed"
 	"fmt"
 	_ "image/png"
 	"time"
 
-	"game/loadsprites"
-
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
@@ -41,7 +41,7 @@ type Game struct {
 
 	//Player sprites and animations
 
-	playerSpriteSheet  *ebiten.Image
+	PlayerSpriteSheet  *ebiten.Image
 	playerFrames       []*ebiten.Image
 	playerLosingFrames []*ebiten.Image
 	currentFrame       int
@@ -49,7 +49,7 @@ type Game struct {
 	playerTickCount int
 
 	//Enemies sprites and animations
-	enemiesSpriteSheet *ebiten.Image
+	EnemiesSpriteSheet *ebiten.Image
 	enemiesFrames      []*ebiten.Image
 	enemies            []Enemie
 	enemiePattern      int
@@ -59,6 +59,19 @@ type Game struct {
 
 	//bgMovement
 	BackgroundY float64
+
+	//Images
+	BackgroundImage *ebiten.Image
+	MenuImage       *ebiten.Image
+	TryAgainImage   *ebiten.Image
+
+	//Music
+	MenuPlayer *audio.Player
+	GamePlayer *audio.Player
+	HitPlayer  *audio.Player
+
+	//FS
+	FileSystem *embed.FS
 }
 
 type Enemie struct {
@@ -184,52 +197,42 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	//Dibujar menu al iniciar el juego
 	if g.InitialMenu {
-		bg, _, err := ebitenutil.NewImageFromFile("assets/map/titlePressed.png")
-		if err != nil {
-			panic(err)
-		}
-		screen.DrawImage(bg, &ebiten.DrawImageOptions{})
+		screen.DrawImage(g.MenuImage, &ebiten.DrawImageOptions{})
 		return
 	}
 	//Dibujar menu al perder
 	if g.gameOver {
 		if !g.hitSoundPlayed {
-			HitSound()
+			g.HitPlayer.Play()
+			time.Sleep(100 * time.Millisecond)
+			g.HitPlayer.Pause()
 		}
 		g.hitSoundPlayed = true // Evita que el sonido se reproduzca varias veces
 		time.Sleep(300 * time.Millisecond)
-		SwitchMusic(MenuState)
+		SwitchMusic(g, MenuState)
 
 		//Dibujos
 		drawer := &ebiten.DrawImageOptions{}
 		drawer.GeoM.Scale(10, 10)
 		drawer.GeoM.Translate(Configuration.ScreenWidth/2-64, Configuration.ScreenHeight/2-120)
 
-		bg, _, err := ebitenutil.NewImageFromFile("assets/map/tryAgainPressed.png")
-		if err != nil {
-			panic(err)
-		}
-		screen.DrawImage(bg, &ebiten.DrawImageOptions{})
+		screen.DrawImage(g.TryAgainImage, &ebiten.DrawImageOptions{})
 		screen.DrawImage(g.playerLosingFrames[g.currentFrame], drawer)
 
 		return
 	}
 
 	//Si llegamos aqui es porque no estamos en el menu
-	SwitchMusic(GameplayState)
+	SwitchMusic(g, GameplayState)
 
 	//dibujar fondo con color verde
-	background, _, err := ebitenutil.NewImageFromFile("assets/map/map.png")
-	if err != nil {
-		panic(err)
-	}
 	bgdrawer := &ebiten.DrawImageOptions{}
 	bgdrawer.GeoM.Translate(0, g.BackgroundY)
-	screen.DrawImage(background, bgdrawer)
+	screen.DrawImage(g.BackgroundImage, bgdrawer)
 	//segundo fondo
 	op2 := &ebiten.DrawImageOptions{}
 	op2.GeoM.Translate(0, g.BackgroundY-Configuration.ScreenHeight) // Dibuja una segunda copia arriba
-	screen.DrawImage(background, op2)
+	screen.DrawImage(g.BackgroundImage, op2)
 
 	// Dibujar score
 	var str string = fmt.Sprintf("Score: %d, Pattern: %d", g.score, g.enemiePattern)
@@ -270,14 +273,12 @@ func (g *Game) Reset() {
 	ResetGame(g)
 
 	//Load main character
-	g.playerSpriteSheet = loadsprites.LoadFromImage("./assets/player/mc.png")
 	GetMcSprites(g)
 
 	//Load main character losing animation
 	GetLosingMcSprites(g)
 
 	//Load enemies
-	g.enemiesSpriteSheet = loadsprites.LoadFromImage("./assets/enemies/chickens.png")
 	GetEnemiesSprites(g)
 
 }
