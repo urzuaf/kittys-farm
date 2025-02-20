@@ -67,6 +67,15 @@ type Enemie struct {
 	frame     int
 }
 
+type button struct {
+	x, y     float64
+	w, h     float64
+	hovering bool
+}
+
+var menuButton button
+var tryAgainButton button
+
 func (g *Game) Update() error {
 
 	//Comprobar si el juego debe iniciar por primera vez
@@ -75,6 +84,31 @@ func (g *Game) Update() error {
 			time.Sleep(100 * time.Millisecond)
 			g.Reset()
 		}
+		//Comprobar el click con el mouse
+		x, y := ebiten.CursorPosition()
+
+		// Verificar si el cursor está sobre el rectángulo
+		menuButton.hovering = x >= int(menuButton.x) && x <= int(menuButton.x)+int(menuButton.w) && y >= int(menuButton.y) && y <= int(menuButton.y)+int(menuButton.h)
+		if menuButton.hovering {
+			ebiten.SetCursorShape(ebiten.CursorShapePointer)
+		} else {
+			ebiten.SetCursorShape(ebiten.CursorShapeDefault)
+		}
+		if menuButton.hovering && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			time.Sleep(100 * time.Millisecond)
+			g.Reset()
+		}
+
+		//Comprobar con touch
+		touches := ebiten.TouchIDs()
+		for _, touchID := range touches {
+			tx, ty := ebiten.TouchPosition(touchID)
+			if tx >= int(menuButton.x) && tx <= int(menuButton.x+menuButton.w) && ty >= int(menuButton.y) && ty <= int(menuButton.y+menuButton.h) {
+				time.Sleep(100 * time.Millisecond)
+				g.Reset()
+			}
+		}
+
 		return nil
 	}
 
@@ -85,8 +119,35 @@ func (g *Game) Update() error {
 			time.Sleep(100 * time.Millisecond)
 			g.Reset()
 		}
+		//Comprobar el click con el mouse
+		x, y := ebiten.CursorPosition()
+
+		// Verificar si el cursor está sobre el rectángulo
+		tryAgainButton.hovering = x >= int(tryAgainButton.x) && x <= int(tryAgainButton.x)+int(tryAgainButton.w) && y >= int(tryAgainButton.y) && y <= int(tryAgainButton.y)+int(tryAgainButton.h)
+		if tryAgainButton.hovering {
+			ebiten.SetCursorShape(ebiten.CursorShapePointer)
+		} else {
+			ebiten.SetCursorShape(ebiten.CursorShapeDefault)
+		}
+		if tryAgainButton.hovering && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			time.Sleep(100 * time.Millisecond)
+			g.Reset()
+		}
+
+		//Comprobar con touch
+		touches := ebiten.TouchIDs()
+		for _, touchID := range touches {
+			tx, ty := ebiten.TouchPosition(touchID)
+			if tx >= int(tryAgainButton.x) && tx <= int(tryAgainButton.x+tryAgainButton.w) && ty >= int(tryAgainButton.y) && ty <= int(tryAgainButton.y+tryAgainButton.h) {
+				time.Sleep(100 * time.Millisecond)
+				g.Reset()
+			}
+		}
+
 		return nil
 	}
+
+	ebiten.SetCursorShape(ebiten.CursorShapeDefault)
 
 	//Aumentar puntuación cada tick
 	g.score++
@@ -203,6 +264,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func (g *Game) Reset() {
 
+	menuButton = button{50, 340, 340, 80, false}
+	tryAgainButton = button{10, 370, 410, 80, false}
 	//Resetear parametros
 	ResetGame(g)
 
