@@ -19,6 +19,7 @@ func main() {
 	//Cargamos todas las imagenes una vez
 	game.FileSystem = &assets
 	game.BackgroundImage = load.LoadFromImage("assets/map/map.png", assets)
+	game.PauseImage = load.LoadFromImage("assets/map/pause.png", assets)
 	game.MenuImage = load.LoadFromImage("assets/map/titlePressed.png", assets)
 	game.TryAgainImage = load.LoadFromImage("assets/map/tryAgainPressed.png", assets)
 	game.PlayerSpriteSheet = load.LoadFromImage("assets/player/mc.png", assets)

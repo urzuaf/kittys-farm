@@ -14,6 +14,7 @@ func ResetGame(g *Game) {
 
 func ResetGameStruct(g *Game) {
 	g.InitialMenu = false
+	g.Paused = false
 	g.PlayerX = Configuration.ScreenWidth / 2
 	g.PlayerY = Configuration.ScreenHeight - 50
 	fmt.Println(Configuration.ScreenWidth, Configuration.ScreenHeight)

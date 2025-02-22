@@ -69,6 +69,7 @@ type Game struct {
 	BackgroundImage *ebiten.Image
 	MenuImage       *ebiten.Image
 	TryAgainImage   *ebiten.Image
+	PauseImage      *ebiten.Image
 
 	//Music
 	MenuPlayer *audio.Player
@@ -80,6 +81,9 @@ type Game struct {
 
 	//FS
 	FileSystem *embed.FS
+
+	//Pause
+	Paused bool
 }
 
 type Enemie struct {
@@ -169,6 +173,23 @@ func (g *Game) Update() error {
 	}
 
 	ebiten.SetCursorShape(ebiten.CursorShapeDefault)
+
+	//Pausar el juego
+
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		if g.Paused {
+			fmt.Println("Game Unpaused")
+		} else {
+			fmt.Println("Game Paused")
+		}
+
+		g.Paused = !g.Paused
+		return nil
+	}
+
+	if g.Paused {
+		return nil
+	}
 
 	//Aumentar puntuación cada tick
 	g.score++
@@ -265,6 +286,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		screen.DrawImage(b, &ebiten.DrawImageOptions{
 			GeoM: bulletGeoM,
 		})
+	}
+
+	//Dibujar icono de pausa
+	if g.Paused {
+		drawer := &ebiten.DrawImageOptions{}
+		drawer.GeoM.Scale(0.3, 0.3)
+		drawer.GeoM.Translate((Configuration.ScreenWidth)/3-10, Configuration.ScreenHeight/3) // Dibuja una segunda copia arriba
+		screen.DrawImage(g.PauseImage, drawer)
 	}
 
 	//DrawHitboxes(g, screen)
