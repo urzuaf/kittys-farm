@@ -22,8 +22,10 @@ func GetMcSprites(g *Game) {
 	}
 
 	//no queremos el 1r ni 2do frame del spritesheet
-	utils.RemoveElement(&g.playerFrames, 0)
-	utils.RemoveElement(&g.playerFrames, 0)
+	utils.RemoveElement(&g.playerFrames, 1)
+	//utils.RemoveElement(&g.playerFrames, 0)
+	utils.Swap(&g.playerFrames, 0, 1)
+	g.playerFrames = append(g.playerFrames, g.playerFrames[1])
 
 }
 

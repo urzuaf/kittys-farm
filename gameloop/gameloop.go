@@ -193,7 +193,14 @@ func (g *Game) Update() error {
 
 	//Aumentar puntuación cada tick
 	g.score++
-	g.BackgroundY += 2
+	movement := float64(g.score) / 1000
+	if movement < 2 {
+		g.BackgroundY += 2
+	} else if movement > 20 {
+		g.BackgroundY += 20
+	} else {
+		g.BackgroundY += movement
+	}
 
 	if g.BackgroundY >= Configuration.ScreenHeight {
 		g.BackgroundY = 0

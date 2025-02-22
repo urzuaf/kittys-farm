@@ -4,12 +4,18 @@ func AnimateCharacter(g *Game) {
 	//animación del jugador
 	g.playerTickCount++
 
-	if g.playerTickCount%20 == 0 {
+	animationspeed := (5000 - g.playerTickCount) / 100
+	if animationspeed < 4 {
+		animationspeed = 4
+	}
+	if animationspeed > 30 {
+		animationspeed = 30
+	}
+
+	if g.playerTickCount%animationspeed == 0 {
 		g.currentFrame = (g.currentFrame + 1) % (len(g.playerFrames))
 	}
-	if g.playerTickCount >= 10000 {
-		g.playerTickCount = 0
-	}
+
 }
 func AnimateLosingCharacter(g *Game) {
 	//animación del jugador
